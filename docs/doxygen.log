@@ -1,0 +1,13 @@
+warning: failed to open layout file 'doxygenLayout.xml' for reading!
+warning: source img is not a readable file or directory... skipping.
+/home/jaewook/project/github.sec/datamodel-aml-cpp/include/AMLInterface.h:146: warning: no matching class member found for 
+  void AML::AMLObject::copyData(AMLObject *target) const
+
+/home/jaewook/project/github.sec/datamodel-aml-cpp/include/AMLInterface.h:72: warning: argument 'timestamp' of command @param is not found in the argument list of AML::AMLObject::AMLObject(const std::string &deviceId, const std::string &timeStamp)
+/home/jaewook/project/github.sec/datamodel-aml-cpp/include/AMLInterface.h:72: warning: The following parameters of AML::AMLObject::AMLObject(const std::string &deviceId, const std::string &timeStamp) are not documented:
+  parameter 'timeStamp'
+/home/jaewook/project/github.sec/datamodel-aml-cpp/include/AMLInterface.h:79: warning: argument 'timestamp' of command @param is not found in the argument list of AML::AMLObject::AMLObject(const std::string &deviceId, const std::string &timeStamp, const std::string &id)
+/home/jaewook/project/github.sec/datamodel-aml-cpp/include/AMLInterface.h:79: warning: The following parameters of AML::AMLObject::AMLObject(const std::string &deviceId, const std::string &timeStamp, const std::string &id) are not documented:
+  parameter 'timeStamp'
+/home/jaewook/project/github.sec/datamodel-aml-cpp/include/Representation.h:76: warning: Found unknown command `\node'
+/home/jaewook/project/github.sec/datamodel-aml-cpp/include/Representation.h:66: warning: Found unknown command `\node'

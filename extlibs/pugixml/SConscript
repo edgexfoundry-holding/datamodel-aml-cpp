@@ -1,0 +1,59 @@
+##
+# script to check if pugixml library is installed.
+# If not, get it and install it
+##
+
+import os
+Import('env')
+
+pugixml_env = env.Clone()
+target_os = pugixml_env.get('TARGET_OS')
+target_arch = pugixml_env.get('TARGET_ARCH')
+
+src_dir = pugixml_env.get('SRC_DIR')
+
+targets_need_pugixml = ['linux', 'windows']
+
+PUGIXML_VERSION = '1.8'
+pugixml_dir = os.path.join(src_dir, 'extlibs', 'pugixml', 'pugixml-' + PUGIXML_VERSION)
+pugixml_lib_dir = os.path.join(pugixml_dir, 'lib')
+pugixml_tar_file = 'pugixml-' + PUGIXML_VERSION + '.tar.gz'
+pugixml_url = 'http://github.com/zeux/pugixml/releases/download/v' + PUGIXML_VERSION + '/' + pugixml_tar_file
+pugixml_tar_path = os.path.join(src_dir, 'extlibs', 'pugixml', pugixml_tar_file)
+
+# nothing to do if this target doesn't use pugixml
+if target_os not in targets_need_pugixml:
+    Return("pugixml_env")
+
+# nothing to do if asked for help
+if pugixml_env.GetOption('help'):
+    Return("pugixml_env")
+
+# nothing to do if 'clean' is specified
+if pugixml_env.GetOption('clean'):
+    Return("pugixml_env")
+
+print '*** Checking for installation of pugixml %s ***' % PUGIXML_VERSION
+# If the pugixml tar file is not already present, download it
+if not os.path.exists(pugixml_tar_file):
+    pugixml_tar = pugixml_env.Download(pugixml_tar_path, pugixml_url)
+else:
+    pugixml_tar = pugixml_tar_path
+
+if not os.path.exists(pugixml_dir):
+    print 'Unzipping to : ' + pugixml_dir
+    pugixml_env.UnpackAll(pugixml_dir, pugixml_tar)
+
+# Export flags once for all
+pugixml_env.PrependUnique(CPPPATH=[os.path.join(pugixml_dir, 'src')])
+if 'g++' in pugixml_env.get('CXX'):
+    pugixml_env.AppendUnique(CXXFLAGS=['-std=c++0x'])
+    pugixml_env.AppendUnique(CXXFLAGS=['-Wall'])
+    # Note: 'pthread' for android is in bionic
+    # On other platforms, if use new gcc(>4.9?) it isn't required,
+    # otherwise, it's required
+pugixml_env.PrependUnique(LIBS=['pugixml'])
+if target_os in ['windows']:
+    pugixml_env.AppendUnique(LINKFLAGS=['/subsystem:CONSOLE'])
+
+Return('pugixml_env')
