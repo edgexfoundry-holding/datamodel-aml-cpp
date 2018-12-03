@@ -1,0 +1,92 @@
+###############################################################################
+# Copyright 2018 Samsung Electronics All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+###############################################################################
+
+##
+# AML DataModel Unit Test build script
+##
+
+import os
+from build_common.tools.RunTest import run_test
+
+Import('env')
+
+gtest_env = SConscript('#extlibs/gtest/SConscript')
+lib_env = gtest_env.Clone()
+
+if lib_env.get('RELEASE'):
+    lib_env.AppendUnique(CCFLAGS=['-Os'])
+else:
+    lib_env.AppendUnique(CCFLAGS=['-g'])
+    lib_env.AppendUnique(CPPDEFINES=['DEBUG_LOG'])
+
+
+aml_test_env = lib_env.Clone()
+target_os = aml_test_env.get('TARGET_OS')
+disable_protobuf = aml_test_env.get('DISABLE_PROTOBUF')
+
+######################################################################
+# Build flags
+######################################################################
+
+aml_test_env.AppendUnique(LIBPATH=[lib_env.get('BUILD_DIR')])
+aml_test_env.AppendUnique(LIBS=['aml'])
+
+if not disable_protobuf:
+    aml_test_env.AppendUnique(LIBS=['protobuf'])
+
+if target_os not in ['windows']:
+    aml_test_env.AppendUnique(
+        CXXFLAGS=['-O2', '-g', '-Wall', '-fmessage-length=0', '-I/usr/local/include'])
+
+if not aml_test_env.get('RELEASE'):
+    aml_test_env.PrependUnique(LIBS=['gcov'])
+    aml_test_env.AppendUnique(CXXFLAGS=['--coverage'])
+
+aml_test_env.AppendUnique(CPPPATH=[
+    '../include',
+    '../src',
+    '.'
+])
+
+if not disable_protobuf:
+    aml_test_env.AppendUnique(CPPPATH=['../protobuf'])
+else:
+    aml_test_env.AppendUnique(CPPDEFINES = ['_DISABLE_PROTOBUF_'])
+
+######################################################################
+# Build Test
+######################################################################
+
+aml_rep_test_src = [
+    'AMLRepresentationTest.cpp',
+    'AMLInterfaceTest.cpp'
+]
+
+aml_rep_test = aml_test_env.Program('aml_rep_test', aml_rep_test_src)
+
+Alias("aml_rep_test", aml_rep_test)
+aml_test_env.AppendTarget('aml_rep_test')
+
+Command("TEST_Data.aml", File("TEST_Data.aml").srcnode(), Copy("$TARGET", "$SOURCE"))
+Command("TEST_DataBinary", File("TEST_DataBinary").srcnode(), Copy("$TARGET", "$SOURCE"))
+Command("TEST_DataModel.aml", File("TEST_DataModel.aml").srcnode(), Copy("$TARGET", "$SOURCE"))
+Command("TEST_DataModel_Invalid_NoCAEX.aml", File("TEST_DataModel_Invalid_NoCAEX.aml").srcnode(), Copy("$TARGET", "$SOURCE"))
+Command("TEST_DataModel_Invalid_NoSUCL.aml", File("TEST_DataModel_Invalid_NoSUCL.aml").srcnode(), Copy("$TARGET", "$SOURCE"))
+
+if env.get('TEST') == '1':
+	#Command("copy_tmp_file", File("TEST_DataModel.aml").srcnode(), Copy("./", "$SOURCE"))
+	run_test(aml_test_env, '', 'unittests/aml_rep_test', aml_rep_test)

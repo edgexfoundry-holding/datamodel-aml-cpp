@@ -1,0 +1,49 @@
+###############################################################################
+# Copyright 2018 Samsung Electronics All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+###############################################################################
+
+################ AML DataModel build script ##################
+import os
+Import('env')
+
+aml_sample_env = env.Clone()
+target_arch = aml_sample_env.get('TARGET_ARCH')
+disable_protobuf = aml_sample_env.get('DISABLE_PROTOBUF')
+
+######################################################################
+# Build flags
+######################################################################
+aml_sample_env.PrependUnique(CPPPATH=['../include'])
+
+if not disable_protobuf:
+    aml_sample_env.PrependUnique(CPPPATH=['../protobuf'])
+
+aml_sample_env.AppendUnique(
+    CXXFLAGS=['-O2', '-g', '-Wall', '-fmessage-length=0', '-std=c++0x', '-I/usr/local/include'])
+
+aml_sample_env.AppendUnique(LIBS=['aml'])
+
+if not disable_protobuf:
+    aml_sample_env.AppendUnique(LIBS=['protobuf'])
+else:
+    aml_sample_env.AppendUnique(CPPDEFINES = ['_DISABLE_PROTOBUF_'])
+
+####################################################################
+# Source files and Targets
+######################################################################
+amlsample = aml_sample_env.Program('sample', ['sample.cpp'])
+
+Command("sample_data_model.aml", File("sample_data_model.aml").srcnode(), Copy("$TARGET", "$SOURCE"))

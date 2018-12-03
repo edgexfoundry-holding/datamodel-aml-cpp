@@ -1,0 +1,73 @@
+syntax = "proto2";
+
+package datamodel;
+
+option java_package = "edge.datamodel.protobuf.aml";
+option java_outer_classname = "ProtoAML";
+
+message CAEXFile {
+	required string FileName = 1;
+	required string SchemaVersion = 2;
+	required string xsi = 3;
+	required string xmlns = 4;
+	repeated InstanceHierarchy InstanceHierarchy= 5;
+}
+
+message RoleClassLib {
+	required string Name = 1;
+	optional string Description = 2;
+	optional string Version = 3;
+	repeated RoleClass RoleClass = 4;
+}
+
+message RoleClass {
+	required string Name = 1;
+	optional string Description = 2;
+	optional string RefBaseClassPath = 3;
+	repeated Attribute Attribute = 4;
+}
+
+message SystemUnitClassLib {
+	required string Name = 1;
+	optional string Version = 2;
+	repeated SystemUnitClass SystemUnitClass = 4;
+}
+
+message SystemUnitClass {
+	required string Name = 1;
+	optional string RefBaseClassPath = 2;
+	optional SupportedRoleClass SupportedRoleClass = 3;
+	repeated InternalElement InternalElement = 4;
+	repeated Attribute Attribute = 5;
+}
+
+message InstanceHierarchy {
+	required string Name = 1;
+	optional string Version = 2;
+	repeated InternalElement InternalElement = 3;
+}
+
+message InternalElement {
+	required string Name = 1;
+	optional string RefBaseSystemUnitPath = 2;
+	optional SupportedRoleClass SupportedRoleClass = 3;
+	repeated InternalElement InternalElement = 4;
+	repeated Attribute Attribute = 5; 
+}
+
+message SupportedRoleClass {
+	required string RefRoleClassPath = 1;
+}
+
+message RefSemantic {
+	required string CorrespondingAttributePath = 1;
+}
+
+message Attribute {
+	required string Name = 1;
+	required string AttributeDataType = 2;
+	optional string Value = 3;
+	optional RefSemantic RefSemantic = 4;
+	repeated Attribute Attribute = 5;
+}
+
